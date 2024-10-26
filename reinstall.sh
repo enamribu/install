@@ -3330,6 +3330,18 @@ if is_secure_boot_enabled; then
     error_and_exit "Please disable secure boot first."
 fi
 
+# 密码
+if ! is_netboot_xyz && [ -z "$password" ]; then
+    if is_use_dd; then
+        echo "
+This password is only used for SSH access to view logs during the DD process.
+Password of the image will NOT modify.
+"
+
+    fi
+    prompt_password
+fi
+
 # 必备组件
 install_pkg curl grep
 

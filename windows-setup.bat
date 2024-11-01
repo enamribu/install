@@ -43,6 +43,11 @@ echo list vol | diskpart | find "efi" && (
     set BootType=bios
 )
 
+rem 获取 ProductType
+for /f "tokens=3" %%a in ('reg query "HKLM\SYSTEM\CurrentControlSet\Control\ProductOptions" /v ProductType') do (
+    set "ProductType=%%a"
+)
+
 rem 获取 BuildNumber
 for /f "tokens=3" %%a in ('reg query "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v CurrentBuildNumber') do (
     set "BuildNumber=%%a"
@@ -90,11 +95,16 @@ rem 重新分区/格式化
 
     echo create part primary
     echo format fs=ntfs quick
+    rem echo assign letter=Z
 ) else (
     echo select disk %DiskIndex%
 
     echo select part 1
+    rem echo delete part override
+    rem echo create part primary
     echo format fs=ntfs quick
+    echo active
+    rem echo assign letter=Z
 )) > X:\diskpart.txt
 
 rem 使用 diskpart /s ，出错不会执行剩下的 diskpart 命令
@@ -104,6 +114,21 @@ del X:\diskpart.txt
 rem 盘符
 rem X boot.wim (ram)
 rem Y installer
+rem Z os
+
+rem 删除 boot.wim (bios 才有，vista 也有) 并创建虚拟内存
+rem vista/2008 不能删除，安装时要用
+if %BuildNumber% GEQ 7600 if exist Y:\sources\boot.wim (
+    del Y:\sources\boot.wim
+    call :createPageFile
+)
+
+rem 旧版安装程序会自动在C盘设置虚拟内存，新版安装程序(24h2)不会
+rem 如果不创建虚拟内存，do/aws 1g 内存 bios 引导的机器无法完成安装
+if %BuildNumber% GEQ 26040 (
+    rem 因为上面已经删除了 boot.wim 并创建虚拟内存，因此这步不需要
+    rem call :createPageFileOnZ
+)
 
 rem 设置应答文件的主硬盘 id
 set "file=X:\windows.xml"
@@ -129,12 +154,16 @@ for %%a in (RAM TPM SecureBoot) do (
 )
 
 rem 设置
-set EnableEMS=0
 set ForceOldSetup=0
 set EnableUnattended=1
 
-if "%EnableEMS%"=="1" (
-    set EMS=/EMSPort:COM1 /EMSBaudRate:115200
+rem 运行 ramdisk X:\setup.exe 的话
+rem vista 会找不到安装源
+rem server 23h2 会无法运行
+if "%ForceOldSetup%"=="1" (
+    set setup=Y:\sources\setup.exe
+) else (
+    set setup=Y:\setup.exe
 )
 
 if "%EnableUnattended%"=="1" (
@@ -161,13 +190,11 @@ if %BuildNumber% GEQ 26040 if "%ForceOldSetup%"=="0" (
     set ResizeRecoveryPartition=/ResizeRecoveryPartition Disable
 )
 
-rem 运行 ramdisk X:\setup.exe 的话
-rem vista 会找不到安装源
-rem server 23h2 会无法运行
-if "%ForceOldSetup%"=="1" (
-    set setup=Y:\sources\setup.exe
-) else (
-    set setup=Y:\setup.exe
+rem 为 windows server 打开 EMS
+rem 普通 windows 没有自带 EMS 组件，暂不处理
+if "%ProductType%"=="ServerNT" (
+    rem set EMS=/EMSPort:UseBIOSSettings /EMSBaudRate:115200
+    set EMS=/EMSPort:COM1 /EMSBaudRate:115200
 )
 
 %setup% %ResizeRecoveryPartition% %EMS% %Unattended%
@@ -184,10 +211,14 @@ exit /b
 
 :createPageFile
 rem 尽量填满空间，pagefile 默认 64M
-for /l %%i in (1, 1, 10) do (
+for /l %%i in (1, 1, 100) do (
     wpeutil CreatePageFile /path=Y:\pagefile%%i.sys 2>nul
     if errorlevel 1 (
         exit /b
     )
 )
+exit /b
+
+:createPageFileOnZ
+wpeutil CreatePageFile /path=Z:\pagefile.sys /size=512
 exit /b

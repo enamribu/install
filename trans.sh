@@ -4189,7 +4189,7 @@ install_windows() {
     # 优点: 可以节省 200M~600M 空间，用来创建虚拟内存
     #       （意义不大，因为已经删除了 boot.wim 用来创建虚拟内存，vista 除外）
     # 缺点: 如果 install.wim 只有一个镜像，则只能缩小 10M+
-    if true; then
+    if false; then
         time wimexport --threads "$(get_build_threads 512)" "$iso_install_wim" "$image_name" "$install_wim"
         info "install.wim size"
         echo "Original:  $(get_filesize_mb "$iso_install_wim")"
@@ -4374,6 +4374,7 @@ install_windows() {
             case "$nt_ver" in
             6.1) echo 8.3.2 ;; # sha1 签名
             # 6.1) echo 8.3.5 ;; # sha256 签名
+            6.2 | 6.3) echo 8.4.3 ;;
             *) echo Latest ;;
             esac
         )

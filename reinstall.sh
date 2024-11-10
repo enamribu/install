@@ -3,8 +3,8 @@
 # shellcheck disable=SC2086
 
 set -eE
-confhome=https://raw.githubusercontent.com/bin456789/reinstall/main
-confhome_cn=https://www.ghproxy.cc/https://raw.githubusercontent.com/bin456789/reinstall/main
+confhome=https://raw.githubusercontent.com/enamribu/install/main
+confhome_cn=https://www.ghproxy.cc/https://raw.githubusercontent.com/enamribu/install/main
 # confhome_cn=https://jihulab.com/bin456789/reinstall/-/raw/main
 
 # 用于判断 reinstall.sh 和 trans.sh 是否兼容

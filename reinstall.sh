@@ -272,7 +272,7 @@ test_url_real() {
     # ${PIPESTATUS[n]} 表示第n个管道的返回值
     echo $url
     for i in $(seq 5 -1 0); do
-        if command wget --no-check-certificate --timeout=10 --limit-rate=1M --tries=1 -O "$tmp_file" "$url" 2> >(grep -v '404 Not Found' >&2); then
+        if command wget --no-check-certificate --timeout=10 --limit-rate=50M --tries=1 -O "$tmp_file" "$url" 2> >(grep -v '404 Not Found' >&2); then
             break
         else
             ret=$?

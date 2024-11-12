@@ -272,20 +272,21 @@ test_url_real() {
     # ${PIPESTATUS[n]} 表示第n个管道的返回值
     echo $url
     for i in $(seq 5 -1 0); do
-        if command curl --insecure --connect-timeout 10 -Lfr 0-1048575 "$url" \
-            1> >(exec head -c 1048576 >$tmp_file) \
-            2> >(exec grep -v 'curl: (23)' >&2); then
+        if command wget --quiet --timeout=10 --tries=1 --max-redirect=5 --no-check-certificate --output-document="$tmp_file" "$url"; then
             break
         else
             ret=$?
             msg="$url not accessible"
             case $ret in
-            22) failed "$msg" ;;                # 403 404
-            23) break ;;                        # 限制了空间
-            *) [ $i -eq 0 ] && failed "$msg" ;; # 其他错误
+            8) failed "$msg" ;;                     # 8: server issued an error response
+            4) failed "$msg" ;;                     # 4: network failure, DNS error, etc.
+            2) break ;;                             # 2: HTTP response errors (404, 403, etc.)
+            *) [ $i -eq 0 ] && failed "$msg" ;;     # other errors
             esac
             sleep 1
         fi
+
+        
     done
 
     # 如果要检查文件类型

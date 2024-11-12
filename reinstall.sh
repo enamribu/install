@@ -272,7 +272,7 @@ test_url_real() {
     # ${PIPESTATUS[n]} 表示第n个管道的返回值
     echo $url
     for i in $(seq 5 -1 0); do
-        if command wget --quiet --timeout=10 --tries=1 --max-redirect=5 --no-check-certificate --output-document="$tmp_file" "$url"; then
+        if command wget --timeout=10 --tries=1 --max-redirect=5 --no-check-certificate --output-document="$tmp_file" "$url"; then
             break
         else
             ret=$?

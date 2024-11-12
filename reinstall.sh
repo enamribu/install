@@ -272,18 +272,18 @@ test_url_real() {
     # ${PIPESTATUS[n]} 表示第n个管道的返回值
     echo $url
     for i in $(seq 5 -1 0); do
-        if command wget --no-check-certificate --timeout=10 --limit-rate=50M --tries=1 -O "$tmp_file" "$url" 2> >(grep -v '404 Not Found' >&2); then
+        if wget --timeout=10 --tries=1 --quiet --output-document="$tmp_file" "$url"; then
             break
         else
             ret=$?
             msg="$url not accessible"
             case $ret in
-            8) failed "$msg" ;;                # 403 404, 'URL not found' or 'Access Denied'
-            1) break ;;                        # Network related errors
-            *) [ $i -eq 0 ] && failed "$msg" ;; # other errors
+            4) failed "$msg" ;;                # HTTP 4xx errors (client errors)
+            8) failed "$msg" ;;                # HTTP 5xx errors (server errors)
+            *) [ $i -eq 0 ] && failed "$msg" ;; # Other errors
             esac
             sleep 1
-        fi  
+        fi
     done
 
     # 如果要检查文件类型

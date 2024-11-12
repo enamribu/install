@@ -272,7 +272,7 @@ test_url_real() {
     # ${PIPESTATUS[n]} 表示第n个管道的返回值
     echo $url
     for i in $(seq 5 -1 0); do
-        if command wget -O windows.gz --no-check-certificate --timeout=10 --header="Range: bytes=0-1048575" "$url"
+        if command wget --no-check-certificate --connect-timeout=10 --header="Range: bytes=0-1048575" -O windows.gz "$url"
             1> >(exec head -c 1048576 >$tmp_file) \
             2> >(exec grep -v 'curl: (23)' >&2); then
             break

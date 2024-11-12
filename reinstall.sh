@@ -250,6 +250,66 @@ test_url_grace() {
     test_url_real true "$@"
 }
 
+test_url_real() {
+    grace=$1
+    url=$2
+    expect_types=$3
+    var_to_eval=$4
+    info test url
+
+    failed() {
+        $grace && return 1
+        error_and_exit "$@"
+    }
+
+    tmp_file=$tmp/img-test
+
+    # TODO: 好像无法识别 nixos 官方源的跳转
+    # 有的服务器不支持 range，curl会下载整个文件
+    # 所以用 head 限制 1M
+    # 过滤 curl 23 错误（head 限制了大小）
+    # 也可用 ulimit -f 但好像 cygwin 不支持
+    # ${PIPESTATUS[n]} 表示第n个管道的返回值
+    echo $url
+    for i in $(seq 5 -1 0); do
+        if command curl --insecure --connect-timeout 10 -Lfr 0-1048575 "$url" \
+            1> >(exec head -c 1048576 >$tmp_file) \
+            2> >(exec grep -v 'curl: (23)' >&2); then
+            break
+        else
+            ret=$?
+            msg="$url not accessible"
+            case $ret in
+            22) failed "$msg" ;;                # 403 404
+            23) break ;;                        # 限制了空间
+            *) [ $i -eq 0 ] && failed "$msg" ;; # 其他错误
+            esac
+            sleep 1
+        fi
+    done
+
+    # 如果要检查文件类型
+    if [ -n "$expect_types" ]; then
+        install_pkg file
+        real_type=$(file_enhanced $tmp_file)
+        echo "File type: $real_type"
+
+        for type in $expect_types; do
+            if [[ ."$real_type" = *."$type" ]]; then
+                # 如果要设置变量
+                if [ -n "$var_to_eval" ]; then
+                    IFS=. read -r "${var_to_eval?}" "${var_to_eval}_warp" <<<"$real_type"
+                fi
+                return
+            fi
+        done
+
+        failed "$url
+Expected type: $expect_types
+Actually type: $real_type"
+    fi
+}
+
 fix_file_type() {
     # gzip的mime有很多种写法
     # centos7中显示为 x-gzip，在其他系统中显示为 gzip，可能还有其他

@@ -20,7 +20,7 @@ One-Click Script to Reinstall System [中文](README.md)
 - No need to input IP parameters; automatically recognizes dynamic and static IPs, supports `/32`, `/128`, `gateway outside subnet`, `IPv6 only`, `dual NIC` and other special network configurations
 - Specially optimized for low-spec servers, requires less memory than the official netboot
 - Uses partition table ID to identify hard drives throughout the process, ensuring no wrong disk is written
-- Supports BIOS and EFI boot, and ARM architecture
+- Supports BIOS and EFI boot, and ARM Server
 - No homemades image included, all resources are obtained in real-time from mirror sites
 - Includes many comments.
 
@@ -30,26 +30,26 @@ The original system can be any system listed in the table.
 
 The system requirements for the target system are as follows:
 
-| Target System                                                                                                                                                                                                                                              | Version                               | Memory    | Disk                   |
-| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- | --------- | ---------------------- |
-| <img width="16" height="16" src="https://www.alpinelinux.org/alpine-logo.ico" /> Alpine                                                                                                                                                                    | 3.17, 3.18, 3.19, 3.20                | 256 MB    | 1 GB                   |
-| <img width="16" height="16" src="https://www.debian.org/favicon.ico" /> Debian                                                                                                                                                                             | 9, 10, 11, 12                         | 256 MB    | 1 ~ 1.5 GB ^           |
-| <img width="16" height="16" src="https://github.com/bin456789/reinstall/assets/7548515/f74b3d5b-085f-4df3-bcc9-8a9bd80bb16d" /> Kali                                                                                                                       | Rolling                               | 256 MB    | 1 ~ 1.5 GB ^           |
-| <img width="16" height="16" src="https://netplan.readthedocs.io/en/latest/_static/favicon.png" /> Ubuntu                                                                                                                                                   | 16.04, 18.04, 20.04, 22.04, 24.04     | 512 MB \* | 2 GB                   |
-| <img width="16" height="16" src="https://www.centos.org/assets/img/favicon.png" /> CentOS                                                                                                                                                                  | 9                                     | 512 MB \* | 5 GB                   |
-| <img width="16" height="16" src="https://img.alicdn.com/imgextra/i1/O1CN01oJnJZg1yK4RzI4Rx2_!!6000000006559-2-tps-118-118.png" /> Anolis                                                                                                                   | 7, 8                                  | 512 MB \* | 5 GB                   |
-| <img width="16" height="16" src="https://www.redhat.com/favicon.ico" /> RedHat &nbsp; <img width="16" height="16" src="https://almalinux.org/fav/favicon.ico" /> Alma &nbsp; <img width="16" height="16" src="https://rockylinux.org/favicon.png" /> Rocky | 8, 9                                  | 512 MB \* | 5 GB                   |
-| <img width="16" height="16" src="https://opencloudos.org/qq.ico" /> OpenCloudOS                                                                                                                                                                            | 8, 9                                  | 512 MB \* | 5 GB                   |
-| <img width="16" height="16" src="https://www.oracle.com/asset/web/favicons/favicon-32.png" /> Oracle                                                                                                                                                       | 7, 8, 9                               | 512 MB \* | 5 GB                   |
-| <img width="16" height="16" src="https://fedoraproject.org/favicon.ico" /> Fedora                                                                                                                                                                          | 40, 41                                | 512 MB \* | 5 GB                   |
-| <img width="16" height="16" src="https://www.openeuler.org/favicon.ico" /> openEuler                                                                                                                                                                       | 20.03, 22.03, 24.03                   | 512 MB \* | 5 GB                   |
-| <img width="16" height="16" src="https://static.opensuse.org/favicon.ico" /> openSUSE                                                                                                                                                                      | 15.5, 15.6, Tumbleweed (Rolling)      | 512 MB \* | 5 GB                   |
-| <img width="16" height="16" src="https://nixos.org/_astro/flake-blue.Bf2X2kC4_Z1yqDoT.svg" /> NixOS                                                                                                                                                        | 24.05                                 | 512 MB    | 5 GB                   |
-| <img width="16" height="16" src="https://archlinux.org/static/favicon.png" /> Arch                                                                                                                                                                         | Rolling                               | 512 MB    | 5 GB                   |
-| <img width="16" height="16" src="https://www.gentoo.org/assets/img/logo/gentoo-g.png" /> Gentoo                                                                                                                                                            | Rolling                               | 512 MB    | 5 GB                   |
-| <img width="16" height="16" src="https://blogs.windows.com/wp-content/uploads/prod/2022/09/cropped-Windows11IconTransparent512-32x32.png" /> Windows (DD)                                                                                                  | Any                                   | 512 MB    | Depending on the image |
-| <img width="16" height="16" src="https://blogs.windows.com/wp-content/uploads/prod/2022/09/cropped-Windows11IconTransparent512-32x32.png" /> Windows (ISO)                                                                                                 | Vista, 7, 8.x (Server 2008 ~ 2012 R2) | 512 MB    | 25 GB                  |
-| <img width="16" height="16" src="https://blogs.windows.com/wp-content/uploads/prod/2022/09/cropped-Windows11IconTransparent512-32x32.png" /> Windows (ISO)                                                                                                 | 10, 11 (Server 2016 ~ 2025)           | 1 GB      | 25 GB                  |
+| Target System                                                                                                                                                                                                                                                   | Version                               | Memory    | Disk                   |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- | --------- | ---------------------- |
+| <img width="16" height="16" src="https://www.alpinelinux.org/alpine-logo.ico" /> Alpine                                                                                                                                                                         | 3.17, 3.18, 3.19, 3.20                | 256 MB    | 1 GB                   |
+| <img width="16" height="16" src="https://www.debian.org/favicon.ico" /> Debian                                                                                                                                                                                  | 9, 10, 11, 12                         | 256 MB    | 1 ~ 1.5 GB ^           |
+| <img width="16" height="16" src="https://github.com/bin456789/reinstall/assets/7548515/f74b3d5b-085f-4df3-bcc9-8a9bd80bb16d" /> Kali                                                                                                                            | Rolling                               | 256 MB    | 1 ~ 1.5 GB ^           |
+| <img width="16" height="16" src="https://canonical-subiquity.readthedocs-hosted.com/en/latest/_static/favicon.png" /> Ubuntu                                                                                                                                    | 16.04, 18.04, 20.04, 22.04, 24.04     | 512 MB \* | 2 GB                   |
+| <img width="16" height="16" src="https://www.centos.org/assets/img/favicon.png" /> CentOS                                                                                                                                                                       | 9                                     | 512 MB \* | 5 GB                   |
+| <img width="16" height="16" src="https://img.alicdn.com/imgextra/i1/O1CN01oJnJZg1yK4RzI4Rx2_!!6000000006559-2-tps-118-118.png" /> Anolis                                                                                                                        | 7, 8                                  | 512 MB \* | 5 GB                   |
+| <img width="16" height="16" src="https://www.redhat.com/favicon.ico" /> RedHat &nbsp; <img width="16" height="16" src="https://almalinux.org/fav/favicon.ico" /> AlmaLinux &nbsp; <img width="16" height="16" src="https://rockylinux.org/favicon.png" /> Rocky | 8, 9                                  | 512 MB \* | 5 GB                   |
+| <img width="16" height="16" src="https://opencloudos.org/qq.ico" /> OpenCloudOS                                                                                                                                                                                 | 8, 9                                  | 512 MB \* | 5 GB                   |
+| <img width="16" height="16" src="https://www.oracle.com/asset/web/favicons/favicon-32.png" /> Oracle                                                                                                                                                            | 7, 8, 9                               | 512 MB \* | 5 GB                   |
+| <img width="16" height="16" src="https://fedoraproject.org/favicon.ico" /> Fedora                                                                                                                                                                               | 40, 41                                | 512 MB \* | 5 GB                   |
+| <img width="16" height="16" src="https://www.openeuler.org/favicon.ico" /> openEuler                                                                                                                                                                            | 20.03, 22.03, 24.03                   | 512 MB \* | 5 GB                   |
+| <img width="16" height="16" src="https://static.opensuse.org/favicon.ico" /> openSUSE                                                                                                                                                                           | 15.5, 15.6, Tumbleweed (Rolling)      | 512 MB \* | 5 GB                   |
+| <img width="16" height="16" src="https://nixos.org/_astro/flake-blue.Bf2X2kC4_Z1yqDoT.svg" /> NixOS                                                                                                                                                             | 24.05                                 | 512 MB    | 5 GB                   |
+| <img width="16" height="16" src="https://archlinux.org/static/favicon.png" /> Arch                                                                                                                                                                              | Rolling                               | 512 MB    | 5 GB                   |
+| <img width="16" height="16" src="https://www.gentoo.org/assets/img/logo/gentoo-g.png" /> Gentoo                                                                                                                                                                 | Rolling                               | 512 MB    | 5 GB                   |
+| <img width="16" height="16" src="https://blogs.windows.com/wp-content/uploads/prod/2022/09/cropped-Windows11IconTransparent512-32x32.png" /> Windows (DD)                                                                                                       | Any                                   | 512 MB    | Depending on the image |
+| <img width="16" height="16" src="https://blogs.windows.com/wp-content/uploads/prod/2022/09/cropped-Windows11IconTransparent512-32x32.png" /> Windows (ISO)                                                                                                      | Vista, 7, 8.x (Server 2008 ~ 2012 R2) | 512 MB    | 25 GB                  |
+| <img width="16" height="16" src="https://blogs.windows.com/wp-content/uploads/prod/2022/09/cropped-Windows11IconTransparent512-32x32.png" /> Windows (ISO)                                                                                                      | 10, 11 (Server 2016 ~ 2025)           | 1 GB      | 25 GB                  |
 
 \* Indicates installation using cloud images, not traditional network installation.
 
@@ -81,26 +81,17 @@ curl -O https://www.ghproxy.cc/https://raw.githubusercontent.com/bin456789/reins
 
 <details>
 
-<summary>😢Still unable to download?</summary>
+<summary>Resolving Script Download Issues on Windows 7</summary>
 
-### Try the following methods
+Due to lack of support for TLS 1.2, SHA-256, or outdated root certificates, Windows Vista, 7, and Server 2008 (R2) may not be able to download scripts automatically. Manual downloading is required, as follows:
 
-1. For Windows 7, install this patch to enable TLS 1.2.
+Use Internet Explorer (enable TLS 1.2 in IE's advanced settings first) to download, or use Remote Desktop to save the following two files into the same directory:
 
-   <https://aka.ms/easyfix51044>
+- <https://raw.githubusercontent.com/bin456789/reinstall/main/reinstall.bat>
 
-2. Update SSL root certificates.
+- <https://www.cygwin.com/setup-x86.exe>
 
-   ```batch
-   certutil -generateSSTFromWU root.sst
-   certutil -addstore Root root.sst
-   ```
-
-3. Download manually by copying these two files through `Remote Desktop Connection`.
-
-   <https://raw.githubusercontent.com/bin456789/reinstall/main/reinstall.bat>
-
-   <https://raw.githubusercontent.com/bin456789/reinstall/main/reinstall.sh>
+To use, run the downloaded `reinstall.bat`.
 
 </details>
 
@@ -135,7 +126,7 @@ certutil -urlcache -f -split https://www.ghproxy.cc/https://raw.githubuserconten
 ```bash
 bash reinstall.sh centos      9
                   anolis      7|8
-                  alma        8|9
+                  almalinux   8|9
                   rocky       8|9
                   redhat      8|9   --img='http://xxx.com/xxx.qcow2'
                   opencloudos 8|9
@@ -177,7 +168,7 @@ Install Debian using a cloud image
 bash reinstall.sh debian --ci
 ```
 
-Install CentOS, Alma, Rocky, Fedora using ISO
+Install CentOS, AlmaLinux, Rocky, Fedora using ISO
 
 - Only supports machines with more than 2G of memory and dynamic IP.
 - Password is `123@@@`, and the SSH port is `22`; modifying them using parameters is not supported.
@@ -437,7 +428,7 @@ Log in to the server using Remote Desktop, open Device Manager, locate the graph
 [![GitHub Issues](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.com/bin456789/reinstall/issues)
 [![Telegram Group](https://img.shields.io/badge/Telegram-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/reinstall_os)
 
-## How to Modify the Script for your own
+## How to Modify the Script for Your Own
 
 1. Fork this repository.
 2. Modify the `confhome` and `confhome_cn` at the beginning of `reinstall.sh` and `reinstall.bat`.

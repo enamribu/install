@@ -31,19 +31,12 @@ if not exist %tmp% (
     md %tmp%
 )
 
-rem 24h2 默认禁用了 wmic
-where wmic >nul 2>nul
-if errorlevel 1 (
-    DISM /Online /Add-Capability /CapabilityName:WMIC
-)
-
 rem 检查是否国内
-if not exist %tmp%\geoip (
+if not exist geoip (
     rem 部分地区 www.cloudflare.com 被墙
-    call :download http://dash.cloudflare.com/cdn-cgi/trace %tmp%\geoip
-    if errorlevel 1 goto :download_failed
+    call :download http://dash.cloudflare.com/cdn-cgi/trace %~dp0geoip || goto :download_failed
 )
-findstr /c:"loc=CN" %tmp%\geoip >nul
+findstr /c:"loc=CN" geoip >nul
 if not errorlevel 1 (
     rem mirrors.tuna.tsinghua.edu.cn 会强制跳转 https
     set mirror=http://mirror.nju.edu.cn
@@ -70,19 +63,34 @@ if not exist "%tags%" (
     rem wmic os get osarchitecture 显示中文
     rem wmic ComputerSystem get SystemType 显示英文
 
-    for /f "tokens=2 delims==" %%a in ('wmic os get BuildNumber /format:list ^| find "BuildNumber"') do (
-        set /a BuildNumber=%%a
+    rem SystemType
+    rem windows 11 24h2 没有 wmic
+    rem 有的系统精简了 powershell
+    where wmic >nul 2>&1
+    if not errorlevel 1 (
+        for /f "tokens=*" %%a in ('wmic ComputerSystem get SystemType ^| find /i "based"') do (
+            set "SystemType=%%a"
+        )
+    ) else (
+        for /f "delims=" %%a in ('powershell -NoLogo -NoProfile -NonInteractive -Command "(Get-WmiObject win32_computersystem).SystemType"') do (
+            set "SystemType=%%a"
+        )
+    )
+
+    rem BuildNumber
+    for /f "tokens=3" %%a in ('reg query "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v CurrentBuildNumber') do (
+         set /a BuildNumber=%%a
     )
 
     set CygwinEOL=1
 
-    wmic ComputerSystem get SystemType | find "ARM" > nul
+    echo !SystemType! | find "ARM" > nul
     if not errorlevel 1 (
         if !BuildNumber! GEQ 22000 (
             set CygwinEOL=0
         )
     ) else (
-        wmic ComputerSystem get SystemType | find "x64" > nul
+        echo !SystemType! | find "x64" > nul
         if not errorlevel 1 (
             if !BuildNumber! GEQ 9600 (
                 set CygwinEOL=0
@@ -102,19 +110,26 @@ if not exist "%tags%" (
     )
 
     rem 下载 Cygwin
-    call :download http://www.cygwin.com/setup-!CygwinArch!.exe %tmp%\setup-cygwin.exe
-    if errorlevel 1 goto :download_failed
+    if not exist setup-!CygwinArch!.exe (
+        call :download http://www.cygwin.com/setup-!CygwinArch!.exe %~dp0setup-!CygwinArch!.exe || goto :download_failed
+    )
 
     rem 安装 Cygwin
     set site=!mirror!!dir!
-    %tmp%\setup-cygwin.exe --allow-unsupported-windows ^
-                           --quiet-mode ^
-                           --only-site ^
-                           --site !site! ^
-                           --root %SystemDrive%\cygwin ^
-                           --local-package-dir %tmp%\cygwin-local-package-dir ^
-                           --packages %pkgs% ^
-                           && type nul >"%tags%"
+    start /wait setup-!CygwinArch!.exe ^
+        --allow-unsupported-windows ^
+        --quiet-mode ^
+        --only-site ^
+        --site !site! ^
+        --root %SystemDrive%\cygwin ^
+        --local-package-dir %tmp%\cygwin-local-package-dir ^
+        --packages %pkgs% ^
+        && type nul >"%tags%"
+
+        if errorlevel 1 (
+            echo "Failed to install Cygwin."
+            exit /b 1
+        )
 )
 
 rem 在c盘根目录下执行 cygpath -ua . 会得到 /cygdrive/c，因此末尾要有 /
@@ -122,9 +137,7 @@ for /f %%a in ('%SystemDrive%\cygwin\bin\cygpath -ua ./') do set thisdir=%%a
 
 rem 下载 reinstall.sh
 if not exist reinstall.sh (
-    rem call :download %confhome%/reinstall.sh %~dp0reinstall.sh
-    call :download_with_curl %confhome%/reinstall.sh %thisdir%reinstall.sh
-    if errorlevel 1 goto :download_failed
+    call :download_with_curl %confhome%/reinstall.sh %thisdir%reinstall.sh || goto :download_failed
     call :chmod a+x %thisdir%reinstall.sh
 )
 
@@ -148,6 +161,7 @@ exit /b
 
 :download
 rem bits 要求有 Content-Length 才能下载
+rem 据说如果网络设为“按流量计费” bits 也无法下载
 rem https://learn.microsoft.com/en-us/windows/win32/bits/http-requirements-for-bits-downloads
 rem certutil 会被 windows Defender 报毒
 rem windows server 2019 要用第二条 certutil 命令
@@ -160,8 +174,12 @@ if not exist "%~2" exit /b 1
 exit /b
 
 :download_with_curl
+rem 加 --insecure 防止以下错误
+rem curl: (77) error setting certificate verify locations:
+rem   CAfile: /etc/ssl/certs/ca-certificates.crt
+rem   CApath: none
 echo Download: %~1 %~2
-%SystemDrive%\cygwin\bin\curl -L "%~1" -o "%~2"
+%SystemDrive%\cygwin\bin\curl -L --insecure "%~1" -o "%~2"
 exit /b
 
 :chmod
